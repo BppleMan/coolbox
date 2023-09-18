@@ -1,6 +1,6 @@
 [package]
 name = "coolbox"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["BppleMan"]
 license = "Apache-2.0"
