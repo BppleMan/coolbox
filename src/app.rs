@@ -1,6 +1,7 @@
-use crate::cool::{cool_card, Cool};
-use iced::widget::{checkbox, column, component, container, text, Component};
+use iced::widget::{checkbox, column, container, text};
 use iced::{executor, font, Application, Command, Element, Font, Length, Theme};
+
+use crate::cool::{cool_card, Cool};
 
 const ICON_FONT: Font = Font::with_name("icons");
 
@@ -56,9 +57,14 @@ impl Application for App {
                 shaping: text::Shaping::Basic,
             });
 
-        let cool_card = cool_card(Cool::new("zsh", "5.10.0", "A shell")).view(&());
-        // let element = Element::from(cool_card);
-        // component()
+        let cool_card: Element<_, _> = cool_card(
+            Cool::new("zsh", "5.10.0", "A shell"),
+            None,
+            None,
+            None,
+            None,
+        )
+        .into();
 
         let content = column![default_checkbox, custom_checkbox, cool_card].spacing(22);
 

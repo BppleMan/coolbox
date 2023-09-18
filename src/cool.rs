@@ -22,10 +22,3 @@ impl Cool {
         }
     }
 }
-
-pub enum CoolMessage {
-    Pressed(bool),
-    PressedInstall,
-    PressedUninstall,
-    ProgressChanged(u32),
-}
