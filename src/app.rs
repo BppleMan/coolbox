@@ -57,14 +57,21 @@ impl Application for App {
                 shaping: text::Shaping::Basic,
             });
 
-        let cool_card: Element<_, _> = cool_card(
+        // let cool_card: Element<_, _> = cool_card(
+        //     Cool::new("zsh", "5.10.0", "A shell"),
+        //     None,
+        //     None,
+        //     None,
+        //     None,
+        // )
+        // .into();
+        let cool_card = cool_card(
             Cool::new("zsh", "5.10.0", "A shell"),
             None,
             None,
             None,
             None,
-        )
-        .into();
+        );
 
         let content = column![default_checkbox, custom_checkbox, cool_card].spacing(22);
 
