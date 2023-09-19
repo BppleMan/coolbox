@@ -1,7 +1,13 @@
-use iced::widget::{checkbox, column, container, text};
-use iced::{executor, font, Application, Command, Element, Font, Length, Theme};
+use crate::color_extension::RGB;
+use iced::widget::{button, canvas, checkbox, column, container, text, Container, Text};
+use iced::{
+    executor, font, Application, Background, BorderRadius, Color, Command, Element, Font, Length,
+    Theme,
+};
 
 use crate::cool::{cool_card, Cool};
+use crate::widget;
+use crate::widget::ClipContainer;
 
 const ICON_FONT: Font = Font::with_name("icons");
 
@@ -65,6 +71,7 @@ impl Application for App {
         //     None,
         // )
         // .into();
+
         let cool_card = cool_card(
             Cool::new("zsh", "5.10.0", "A shell"),
             None,
@@ -73,11 +80,76 @@ impl Application for App {
             None,
         );
 
+        // let clip: widget::ClipContainer<'_, AppMessage, iced::Renderer> = ClipContainer::new(
+        //     container("Test")
+        //         .width(Length::from(200))
+        //         .height(Length::from(200))
+        //         .style(iced::theme::Container::from(|_: &'_ iced::Theme| {
+        //             iced::widget::container::Appearance {
+        //                 text_color: None,
+        //                 background: Some(Background::from(0xff0000ff.to_rgba())),
+        //                 // background: None,
+        //                 border_radius: Default::default(),
+        //                 border_width: 0.0,
+        //                 border_color: Default::default(),
+        //             }
+        //         }))
+        //         .center_x()
+        //         .center_y(),
+        // );
+        //
+        // let temp: iced::widget::Container<'_, AppMessage, iced::Renderer> = container("Test")
+        //     .width(Length::from(200))
+        //     .height(Length::from(200))
+        //     .style(iced::theme::Container::from(|_: &'_ iced::Theme| {
+        //         iced::widget::container::Appearance {
+        //             text_color: None,
+        //             background: Some(Background::from(0x00ff00ff.to_rgba())),
+        //             // background: None,
+        //             border_radius: Default::default(),
+        //             border_width: 0.0,
+        //             border_color: Default::default(),
+        //         }
+        //     }))
+        //     .center_x()
+        //     .center_y();
+        //
+        // let progress_bar = container("Test")
+        //     .width(Length::Fill)
+        //     .height(Length::Fill)
+        //     .style(iced::theme::Container::from(|_: &'_ iced::Theme| {
+        //         iced::widget::container::Appearance {
+        //             text_color: None,
+        //             background: Some(Background::from(0x0000ffff.to_rgba())),
+        //             // background: None,
+        //             border_radius: Default::default(),
+        //             border_width: 0.0,
+        //             border_color: Default::default(),
+        //         }
+        //     }));
         let content = column![default_checkbox, custom_checkbox, cool_card].spacing(22);
+
+        // let content = container(content)
+        //     .width(420)
+        //     .height(200)
+        //     .align_x(iced::alignment::Horizontal::Center)
+        //     .center_x()
+        //     .center_y()
+        //     .style(iced::theme::Container::from(|_: &'_ iced::Theme| {
+        //         iced::widget::container::Appearance {
+        //             text_color: None,
+        //             background: Some(Background::from(Color::WHITE)),
+        //             // background: None,
+        //             border_radius: BorderRadius::from(12.0),
+        //             border_width: 0.0,
+        //             border_color: Default::default(),
+        //         }
+        //     }));
 
         container(content)
             .width(Length::Fill)
             .height(Length::Fill)
+            .align_x(iced::alignment::Horizontal::Center)
             .center_x()
             .center_y()
             .into()
