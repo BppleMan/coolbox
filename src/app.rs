@@ -1,15 +1,10 @@
-use crate::color_extension::RGB;
-use iced::widget::{button, canvas, checkbox, column, container, text, Container, Text};
-use iced::{
-    executor, font, Application, Background, BorderRadius, Color, Command, Element, Font, Length,
-    Theme,
-};
+use iced::widget::{checkbox, column, container, text};
+use iced::{executor, font, Application, Command, Element, Font, Length, Theme};
 
 use crate::cool::{cool_card, Cool};
-use crate::widget;
-use crate::widget::ClipContainer;
 
-const ICON_FONT: Font = Font::with_name("icons");
+// pub const ICON_FONT: Font = Font::with_name("icons");
+pub const ICON_FONT: Font = Font::with_name("checkbox");
 
 #[derive(Default)]
 pub struct App {
@@ -57,7 +52,8 @@ impl Application for App {
         let custom_checkbox = checkbox("Custom", self.custom_checkbox, AppMessage::CustomChecked)
             .icon(checkbox::Icon {
                 font: ICON_FONT,
-                code_point: '\u{e901}',
+                // code_point: '\u{e901}',
+                code_point: '\u{0786}',
                 size: None,
                 line_height: text::LineHeight::Relative(1.0),
                 shaping: text::Shaping::Basic,
@@ -73,7 +69,11 @@ impl Application for App {
         // .into();
 
         let cool_card = cool_card(
-            Cool::new("zsh", "5.10.0", "A shell"),
+            Cool::new(
+                "zsh",
+                "5.10.0",
+                "A shell aaaaaaaaaaaaaaa aaaa aaaaaaaaaa aaaaaaaaaaa aaaaaaaaaaaa aaaaaaaaaa bbbbbbbbbb bbbbbbbbbbbbb cccccccccc",
+            ),
             None,
             None,
             None,
