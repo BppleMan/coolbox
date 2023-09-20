@@ -4,8 +4,7 @@ import 'package:coolbox/cool_card.dart';
 import 'package:coolbox/model/command.dart';
 import 'package:coolbox/model/cool.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/rendering/sliver.dart';
-import 'package:flutter/src/rendering/sliver_grid.dart';
+import 'package:flutter/rendering.dart';
 
 class CoolGridView extends StatelessWidget {
   const CoolGridView({super.key});
@@ -26,6 +25,7 @@ class CoolGridView extends StatelessWidget {
             crossAxisSpacing: 24,
           ),
           childrenDelegate: SliverChildBuilderDelegate(
+            childCount: 21,
             (context, index) {
               return CoolCard(
                 cool: Cool(
@@ -34,9 +34,9 @@ class CoolGridView extends StatelessWidget {
                       "This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app",
                   // description: "This is a cool app",
                   version: "1.0.0",
-                  install: Command(interpreter: "sh", args: "echo 'hello'"),
-                  uninstall: Command(interpreter: "sh", args: "echo 'hello'"),
-                  update: Command(interpreter: "sh", args: "echo 'hello'"),
+                  install: Shell(interpreter: "sh", args: "echo 'hello'"),
+                  uninstall: Shell(interpreter: "sh", args: "echo 'hello'"),
+                  update: Shell(interpreter: "sh", args: "echo 'hello'"),
                 ),
               );
             },

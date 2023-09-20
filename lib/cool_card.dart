@@ -1,5 +1,6 @@
 import 'package:coolbox/model/cool.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 typedef SelectedChanged = void Function(bool selected);
 
@@ -16,50 +17,53 @@ class CoolCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.zero,
-      borderOnForeground: true,
-      color: const Color(0xff141414),
-      child: InkWell(
-        onTap: () {
-          print("Taped");
-        },
-        child: ClipRRect(
-          borderRadius: const BorderRadius.all(Radius.circular(12)),
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xff434343)),
-              borderRadius: const BorderRadius.all(Radius.circular(12)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 24,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        titleRow(),
-                        const SizedBox(height: 12),
-                        Expanded(child: descriptionRow()),
-                        const SizedBox(height: 16),
-                        buttonRow(),
-                      ],
+    return BlocProvider(
+      create: (context) => CoolCardBloc(),
+      child: BlocBuilder<CoolCardBloc, bool>(
+        builder: (context, state) => InkWell(
+          onTap: () {
+            context.read<CoolCardBloc>().add(CoolCardSelectedEvent(!state));
+          },
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: const Color(0xff434343)),
+                borderRadius: const BorderRadius.all(Radius.circular(12)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 24,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          titleRow(),
+                          const SizedBox(height: 12),
+                          Expanded(child: descriptionRow()),
+                          const SizedBox(height: 16),
+                          buttonRow(),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                const LinearProgressIndicator(
-                  value: 0.5,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurple),
-                  backgroundColor: Colors.grey,
-                ),
-              ],
+                  const LinearProgressIndicator(
+                    value: 0.5,
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(Colors.deepPurple),
+                    backgroundColor: Colors.grey,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -72,12 +76,25 @@ class CoolCard extends StatelessWidget {
       height: 32,
       child: Row(
         children: [
-          Checkbox(
-            value: false,
-            onChanged: (value) {},
-            hoverColor: null,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
+          BlocBuilder<CoolCardBloc, bool>(builder: (context, state) {
+            return SizedBox(
+              width: 24,
+              height: 24,
+              child: Checkbox(
+                value: state,
+                onChanged: (value) {
+                  if (value != null) {
+                    context
+                        .read<CoolCardBloc>()
+                        .add(CoolCardSelectedEvent(value));
+                  }
+                },
+                hoverColor: null,
+                splashRadius: 0.0,
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            );
+          }),
           const SizedBox(width: 10),
           Text(
             cool.name,
@@ -156,5 +173,22 @@ class CoolCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+sealed class CoolCardEvent {}
+
+class CoolCardSelectedEvent extends CoolCardEvent {
+  final bool selected;
+
+  CoolCardSelectedEvent(this.selected);
+}
+
+class CoolCardBloc extends Bloc<CoolCardEvent, bool> {
+  CoolCardBloc() : super(false) {
+    on<CoolCardSelectedEvent>((event, emit) {
+      print("CoolCardBloc: $event");
+      return emit(event.selected);
+    });
   }
 }

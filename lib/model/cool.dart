@@ -1,18 +1,19 @@
 import 'command.dart';
+import 'cool_id.dart';
 
 class Cool {
-  String name;
-  String version;
+  CoolID id;
   String description;
+  List<CoolID> dependencies;
 
-  Command install;
-  Command uninstall;
-  Command update;
+  Shell install;
+  Shell uninstall;
+  Shell update;
 
   Cool({
-    required this.name,
-    required this.version,
+    required this.id,
     required this.description,
+    required this.dependencies,
     required this.install,
     required this.uninstall,
     required this.update,
