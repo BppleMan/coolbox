@@ -1,0 +1,18 @@
+name = 'wget'
+version = '1.21.4'
+description = 'GNU Wget is a free software package for retrieving files using HTTP, HTTPS, FTP and FTPS, the most widely used Internet protocols. It is a non-interactive commandline tool, so it may easily be called from scripts, cron jobs, terminals without X-Windows support, etc.'
+packageManager = 'brew'
+
+[[dependencies]]
+name = 'brew'
+version = '4.1.12'
+description = 'Homebrew installs the stuff you need that Apple (or your Linux system) didn’t.'
+
+[[tasks]]
+name = 'run'
+command = ''
+
+[[tasks]]
+name = 'decompress'
+source = '/Users/bppleman/Downloads/protoc-24.3-osx-x86_64.zip'
+destination = '/Users/bppleman/Downloads/protoc-24.3-osx-x86_64'

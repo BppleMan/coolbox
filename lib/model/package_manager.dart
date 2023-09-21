@@ -18,6 +18,14 @@ sealed class PackageManager {
     var result = await shell.execute(name, "$commandPrefix ${cool.id.name}");
     print(result.output);
   }
+
+  static final Set<PackageManager> packageManagers = <PackageManager>{
+    Brew(),
+  };
+
+  static fromTomlValue(String name) {
+    return packageManagers.firstWhere((element) => element.name == name);
+  }
 }
 
 class Brew extends PackageManager {
@@ -37,7 +45,3 @@ class Brew extends PackageManager {
     // Bash().execute(executable, args)
   }
 }
-
-// enum PackageManagements {
-//   Brew = "brew",
-// }
