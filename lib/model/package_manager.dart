@@ -1,34 +1,43 @@
-import 'dart:io';
+import 'package:coolbox/model/shell.dart';
 
-import 'package:coolbox/model/command.dart';
-import 'package:coolbox/model/cool_id.dart';
+import 'cool.dart';
 
 sealed class PackageManager {
   String name;
   String commandPrefix;
-  bool needsSudo;
-  abstract Shell installCommand;
+  abstract Shell shell;
 
   PackageManager({
     required this.name,
     required this.commandPrefix,
-    required this.needsSudo,
   });
 
-  void installSelf() {
-    installCommand.execute();
-  }
+  void installSelf();
 
-  void install(CoolID id) {
-    Process.start(executable, arguments)
+  void install(Cool cool) async {
+    var result = await shell.execute(name, "$commandPrefix ${cool.id.name}");
+    print(result.output);
   }
 }
 
 class Brew extends PackageManager {
-  @override
-  late Shell installCommand;
+  Brew._() : super(name: "brew", commandPrefix: "install");
 
-  Brew() : super(name: "brew", commandPrefix: "brew install", needsSudo: false) {
-    installCommand = Shell(interpreter: "brew", args: "install");
+  static final Brew _instance = Brew._();
+
+  factory Brew() {
+    return _instance;
+  }
+
+  @override
+  Shell shell = Sh();
+
+  @override
+  void installSelf() {
+    // Bash().execute(executable, args)
   }
 }
+
+// enum PackageManagements {
+//   Brew = "brew",
+// }

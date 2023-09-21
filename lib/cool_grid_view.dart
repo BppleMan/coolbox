@@ -1,10 +1,11 @@
 import 'dart:math' as math;
 
 import 'package:coolbox/cool_card.dart';
-import 'package:coolbox/model/command.dart';
 import 'package:coolbox/model/cool.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
+import 'model/cool_id.dart';
 
 class CoolGridView extends StatelessWidget {
   const CoolGridView({super.key});
@@ -29,14 +30,12 @@ class CoolGridView extends StatelessWidget {
             (context, index) {
               return CoolCard(
                 cool: Cool(
-                  name: "Cool $index",
+                  // name: "Cool $index",
+                  id: CoolID(name: "Cool $index", version: "1.0.0"),
                   description:
                       "This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app",
+                  dependencies: [],
                   // description: "This is a cool app",
-                  version: "1.0.0",
-                  install: Shell(interpreter: "sh", args: "echo 'hello'"),
-                  uninstall: Shell(interpreter: "sh", args: "echo 'hello'"),
-                  update: Shell(interpreter: "sh", args: "echo 'hello'"),
                 ),
               );
             },

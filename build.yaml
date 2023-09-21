@@ -1,0 +1,7 @@
+builders:
+  tomlBuilder:
+    import: "package:coolbox/builder/toml_builder.dart"
+    builder_factories: ["tomlBuilder"]
+    build_extensions: {".dart": [".toml.dart"]}
+    build_to: source
+    auto_apply: root_package

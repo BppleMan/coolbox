@@ -1,6 +1,8 @@
 import 'package:coolbox/model/cool.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:native_dio_adapter/native_dio_adapter.dart';
 
 typedef SelectedChanged = void Function(bool selected);
 
@@ -97,7 +99,7 @@ class CoolCard extends StatelessWidget {
           }),
           const SizedBox(width: 10),
           Text(
-            cool.name,
+            cool.id.name,
             style: const TextStyle(
               fontSize: 20,
               height: 32 / 20,
@@ -106,7 +108,7 @@ class CoolCard extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           Text(
-            cool.version,
+            cool.id.version,
             style: TextStyle(
               color: const Color(0xffffffff).withAlpha(40),
               fontSize: 16,
@@ -142,7 +144,16 @@ class CoolCard extends StatelessWidget {
       children: [
         operateButton(name: "Update", onPressed: () {}),
         const SizedBox(width: 12),
-        operateButton(name: "Install", onPressed: () {}),
+        operateButton(
+            name: "Install",
+            onPressed: () async {
+              var dio = Dio();
+              dio.httpClientAdapter = NativeAdapter();
+              var response = await dio.get<String>(
+                "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh",
+              );
+              print(response.data);
+            }),
       ],
     );
   }

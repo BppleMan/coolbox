@@ -53,6 +53,10 @@ class ShellResult {
   });
 }
 
+final class Bash extends Shell {
+  Bash() : super(executable: "bash", executableArg: "-c");
+}
+
 final class Sh extends Shell {
   Sh() : super(executable: "sh", executableArg: "-c");
 }
