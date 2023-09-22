@@ -4,11 +4,22 @@ import 'package:coolbox/cool_card.dart';
 import 'package:coolbox/model/cool.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'cool_repository.dart';
 import 'model/cool_id.dart';
 
 class CoolGridView extends StatelessWidget {
-  const CoolGridView({super.key});
+  final CoolRepository coolRepository = CoolRepository();
+  late final Stream<Cool> cools;
+
+  CoolGridView({super.key});
+
+  @override
+  StatelessElement createElement() {
+    cools = coolRepository.getCools();
+    return super.createElement();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,16 +39,7 @@ class CoolGridView extends StatelessWidget {
           childrenDelegate: SliverChildBuilderDelegate(
             childCount: 21,
             (context, index) {
-              return CoolCard(
-                cool: Cool(
-                  // name: "Cool $index",
-                  id: CoolID(name: "Cool $index", version: "1.0.0"),
-                  description:
-                      "This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app",
-                  dependencies: [],
-                  // description: "This is a cool app",
-                ),
-              );
+              return;
             },
           ),
         ),

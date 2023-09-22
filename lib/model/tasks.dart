@@ -1,6 +1,7 @@
+import 'package:coolbox/builder/annotation.dart';
 import 'package:coolbox/model/tasks/install.dart';
 import 'package:flutter/foundation.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:toml/toml.dart';
 
 import 'tasks/copy.dart';
 import 'tasks/decompress.dart';
@@ -19,44 +20,38 @@ export 'tasks/move.dart';
 export 'tasks/run.dart';
 export 'tasks/task.dart';
 
-part 'tasks.freezed.dart';
+part 'tasks.data.dart';
 
 typedef TaskCreator = Task Function(Map<String, dynamic>);
 
-@freezed
-class Tasks with _$Tasks {
-  factory Tasks({required List<Task> tasks}) = _Tasks;
+@data
+abstract class ITasks implements TomlEncodableValue {
+  @Toml(
+    from:
+        "[...{}.map((task) => ITasks.taskFactory()[task[\"name\"]]!(task)).toList()]",
+    to: "taskList.map((e) => e.toTomlValue()).toList()",
+  )
+  List<Task> taskList;
 
-  static final Map<String, TaskCreator> taskFactory = {
-    "copy": Copy.fromToml,
-    "move": Move.fromToml,
-    "delete": Delete.fromToml,
-    "download": Download.fromToml,
-    "run": Run.fromToml,
-    "decompress": Decompress.fromToml,
-    "install": Install.fromToml,
-  };
+  ITasks({required this.taskList});
 
-  factory Tasks.fromTomlValue(List<Map<String, dynamic>> documents) {
-    final tasks = documents
-        .map((task) => Tasks.taskFactory[task["name"]]!(task))
-        .toList();
-    return Tasks(tasks: tasks);
-  }
-}
+  static Map<String, TaskCreator> taskFactory() => {
+        "copy": Copy.fromTomlValue,
+        "move": Move.fromTomlValue,
+        "delete": Delete.fromTomlValue,
+        "download": Download.fromTomlValue,
+        "run": Run.fromTomlValue,
+        "decompress": Decompress.fromTomlValue,
+        "install": Install.fromTomlValue,
+      };
 
-extension TasksExtension on Tasks {
   void execute() {
-    for (var task in tasks) {
+    for (var task in taskList) {
       task.execute();
     }
   }
 
   void addTask(Task task) {
-    tasks.add(task);
-  }
-
-  List<Map<String, dynamic>> toTomlValue() {
-    return tasks.map((e) => e.toTomlValue()).toList();
+    taskList.add(task);
   }
 }

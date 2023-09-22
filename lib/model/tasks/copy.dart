@@ -1,19 +1,23 @@
 import 'dart:io';
 
+import 'package:coolbox/builder/annotation.dart';
+
 import 'task.dart';
 
-final class Copy extends Task {
+part 'copy.data.dart';
+
+@data
+abstract class ICopy extends Task {
   String source;
   String destination;
 
-  Copy({
+  ICopy({
     required this.source,
     required this.destination,
   }) : super("copy");
 
   @override
   void execute() {
-    FileSystemEntity.isFileSync(path)
     var source = File(this.source);
     var destination = File(this.destination);
     if (!source.existsSync()) {
@@ -28,35 +32,19 @@ final class Copy extends Task {
     source.copySync(destination.path);
   }
 
-  factory Copy.fromToml(Map<String, dynamic> documents) {
-    return Copy(
-      source: documents["source"],
-      destination: documents["destination"],
-    );
-  }
-
-  @override
-  Map<String, dynamic> toTomlValue() {
-    return {
-      "name": name,
-      "source": source,
-      "destination": destination,
-    };
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Copy &&
-          runtimeType == other.runtimeType &&
-          source == other.source &&
-          destination == other.destination;
-
-  @override
-  int get hashCode => source.hashCode ^ destination.hashCode;
-
-  @override
-  String toString() {
-    return 'Copy{source: $source, destination: $destination}';
-  }
+  // factory ICopy.fromTomlValue(Map<String, dynamic> documents) {
+  //   return Copy(
+  //     source: documents["source"],
+  //     destination: documents["destination"],
+  //   );
+  // }
+  //
+  // @override
+  // Map<String, dynamic> toTomlValue() {
+  //   return {
+  //     "name": name,
+  //     "source": source,
+  //     "destination": destination,
+  //   };
+  // }
 }

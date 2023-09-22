@@ -122,11 +122,11 @@ class CoolCard extends StatelessWidget {
 
   Widget descriptionRow() {
     return Tooltip(
-      message: cool.description,
+      message: cool.id.description,
       verticalOffset: 20,
       waitDuration: const Duration(milliseconds: 500),
       child: Text(
-        cool.description,
+        cool.id.description,
         style: const TextStyle(
           fontSize: 16,
           height: 24 / 16,

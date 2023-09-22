@@ -10,10 +10,10 @@ class CoolBoxHome extends StatelessWidget {
     return Scaffold(
       body: Container(
         padding: const EdgeInsets.all(40),
-        child: const Column(
+        child: Column(
           children: [
-            TitleBar(),
-            SizedBox(height: 40),
+            const TitleBar(),
+            const SizedBox(height: 40),
             CoolGridView(),
           ],
         ),

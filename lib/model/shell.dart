@@ -1,6 +1,11 @@
 import 'dart:io';
 
-sealed class Shell {
+export 'shell/sh.dart';
+export 'shell/bash.dart';
+export 'shell/linux_sudo.dart';
+export 'shell/mac_sudo.dart';
+
+class Shell {
   String executable;
   String executableArg;
   String? args;
@@ -39,6 +44,24 @@ sealed class Shell {
       exitCode: int.parse(exitCode[0]),
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Shell &&
+          runtimeType == other.runtimeType &&
+          executable == other.executable &&
+          executableArg == other.executableArg &&
+          args == other.args;
+
+  @override
+  int get hashCode =>
+      executable.hashCode ^ executableArg.hashCode ^ args.hashCode;
+
+  @override
+  String toString() {
+    return 'Shell{executable: $executable, executableArg: $executableArg, args: $args}';
+  }
 }
 
 class ShellResult {
@@ -51,29 +74,4 @@ class ShellResult {
     required this.errors,
     required this.exitCode,
   });
-}
-
-final class Bash extends Shell {
-  Bash() : super(executable: "bash", executableArg: "-c");
-}
-
-final class Sh extends Shell {
-  Sh() : super(executable: "sh", executableArg: "-c");
-}
-
-final class MacSudo extends Shell {
-  MacSudo()
-      : super(
-          executable: "osascript",
-          executableArg: "-e",
-          args: "do shell script \"{}\" with administrator privileges",
-        );
-}
-
-final class LinuxSudo extends Shell {
-  LinuxSudo()
-      : super(
-          executable: "pkexec",
-          executableArg: "",
-        );
 }

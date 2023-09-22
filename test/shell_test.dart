@@ -2,6 +2,7 @@ import 'package:coolbox/model/cool.dart';
 import 'package:coolbox/model/cool_id.dart';
 import 'package:coolbox/model/package_manager.dart';
 import 'package:coolbox/model/tasks.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:toml/toml.dart';
 
@@ -17,18 +18,18 @@ void main() async {
         source: "/Users/bppleman/Downloads/protoc-24.3-osx-x86_64.zip",
         destination: "/Users/bppleman/Downloads/protoc-24.3-osx-x86_64",
       ),
-      Install(),
+      Copy(source: "source", destination: "destination"),
+      Install(packageManager: Brew()),
     ];
     Cool brew = Cool(
-      id: const CoolID(name: "brew", version: "4.1.12", description: "包管理器"),
+      id: CoolID(name: "brew", version: "4.1.12", description: "包管理器"),
       dependencies: [],
-      tasks: Tasks(tasks: tasks),
+      tasks: Tasks(taskList: tasks),
     );
     Cool wget = Cool(
-      id: const CoolID(name: "wget", version: "1.0.0", description: "下载器"),
+      id: CoolID(name: "wget", version: "1.0.0", description: "下载器"),
       dependencies: [brew.id],
-      tasks: Tasks(tasks: tasks),
-      packageManager: Brew(),
+      tasks: Tasks(taskList: tasks),
     );
     var toml = TomlDocument.fromMap(wget.toTomlValue()).toString();
     print(toml);

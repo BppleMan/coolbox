@@ -1,31 +1,17 @@
-import 'package:flutter/foundation.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:coolbox/builder/annotation.dart';
+import 'package:toml/toml.dart';
 
-part 'cool_id.freezed.dart';
+part 'cool_id.data.dart';
 
-@freezed
-class CoolID with _$CoolID {
-  const factory CoolID({
-    required String name,
-    required String version,
-    required String description,
-  }) = _CoolID;
+@data
+abstract class ICoolID implements TomlEncodableValue {
+  String name;
+  String version;
+  String description;
 
-  factory CoolID.fromTomlValue(Map<String, dynamic> document) {
-    return CoolID(
-      name: document["name"],
-      version: document["version"],
-      description: document["description"],
-    );
-  }
-}
-
-extension CoolIDExtension on CoolID {
-  toTomlValue() {
-    return {
-      "name": name,
-      "version": version,
-      "description": description,
-    };
-  }
+  ICoolID({
+    required this.name,
+    required this.version,
+    required this.description,
+  });
 }

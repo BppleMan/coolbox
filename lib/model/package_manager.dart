@@ -26,6 +26,23 @@ sealed class PackageManager {
   static fromTomlValue(String name) {
     return packageManagers.firstWhere((element) => element.name == name);
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PackageManager &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          commandPrefix == other.commandPrefix &&
+          shell == other.shell;
+
+  @override
+  int get hashCode => name.hashCode ^ commandPrefix.hashCode ^ shell.hashCode;
+
+  @override
+  String toString() {
+    return 'PackageManager{name: $name, commandPrefix: $commandPrefix, shell: $shell}';
+  }
 }
 
 class Brew extends PackageManager {
