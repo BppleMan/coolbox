@@ -6,7 +6,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.1.1"
 authors = ["BppleMan"]
 edition = "2021"
 license-file = "LICENSE"
@@ -16,7 +16,7 @@ repository = "https://github.com/BppleMan/coolbox"
 color-eyre = "0.6.2"
 log = "0.4.20"
 tracing = "0.1.37"
-tracing-subscriber = "0.3.17"
+tracing-subscriber = { version = "0.3.17", features = ["env-filter"] }
 reqwest = { version = "0.11.20", features = ["blocking"] }
 toml = "0.7.6"
 tar = "0.4.40"

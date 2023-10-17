@@ -11,6 +11,14 @@ repository.workspace = true
 crate-type = ["rlib", "dylib"]
 
 [dependencies]
+# local
+coolbox-core = { path = "../core" }
+
+# gui
 egui.workspace = true
 eframe.workspace = true
 color-hex.workspace = true
+
+# misc
+crossbeam.worksapce = true
+rayon.workspace = true

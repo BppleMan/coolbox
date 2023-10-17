@@ -1,3 +1,4 @@
+pub mod progress;
 mod result;
 mod trace;
 

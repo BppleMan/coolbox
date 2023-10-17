@@ -9,6 +9,7 @@ repository.workspace = true
 
 [dependencies]
 # local
+coolbox-core = { path = "../core" }
 coolbox-gui = { path = "../gui" }
 
 # gui
