@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:coolbox/cool_card.dart';
 import 'package:coolbox/model/cool.dart';
+import 'package:coolbox/model/tasks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,7 +40,20 @@ class CoolGridView extends StatelessWidget {
           childrenDelegate: SliverChildBuilderDelegate(
             childCount: 21,
             (context, index) {
-              return;
+              return CoolCard(
+                cool: Cool(
+                  // name: "Cool $index",
+                  id: CoolID(
+                      name: "Wget", version: "1.0.0", description: '命令行下载器'),
+                  // description:
+                  //     "This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app This is a cool app",
+                  dependencies: [],
+                  tasks: Tasks(
+                    taskList: [],
+                  ),
+                  // description: "This is a cool app",
+                ),
+              );
             },
           ),
         ),
