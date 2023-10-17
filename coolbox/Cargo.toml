@@ -1,0 +1,30 @@
+[package]
+name = "coolbox"
+description = "A cool box for your terminal."
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license-file.workspace = true
+repository.workspace = true
+
+[dependencies]
+# local
+coolbox-gui = { path = "../gui" }
+
+# gui
+egui.workspace = true
+eframe.workspace = true
+color-hex.workspace = true
+
+# hot-reloader
+hot-lib-reloader = { version = "0.6.5", optional = true }
+
+# misc
+
+[dev-dependencies]
+uuid = "1.4.1"
+http = "0.2.9"
+
+[features]
+default = []
+hot-reload = ["hot-lib-reloader"]

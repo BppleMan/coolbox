@@ -1,0 +1,16 @@
+[package]
+name = "coolbox-gui"
+description = "A gui lib for cool box."
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license-file.workspace = true
+repository.workspace = true
+
+[lib]
+crate-type = ["rlib", "dylib"]
+
+[dependencies]
+egui.workspace = true
+eframe.workspace = true
+color-hex.workspace = true
