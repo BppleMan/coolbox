@@ -18,7 +18,11 @@ pub mod tasks;
 mod trace;
 
 lazy_static! {
-    pub static ref DEFAULT_TERA_CONTEXT: tera::Context = tera::Context::default();
+    pub static ref DEFAULT_TERA_CONTEXT: tera::Context = {
+        let mut ctx = tera::Context::default();
+        ctx.insert("TEMP_DIR", std::env::temp_dir().to_str().unwrap());
+        ctx
+    };
 }
 
 pub fn render_str<'de, D>(d: D) -> Result<String, D::Error>

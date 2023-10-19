@@ -14,7 +14,7 @@ use tracing::info;
 
 use crate::error::InstallError;
 use crate::result::CoolResult;
-use crate::tasks::Tasks;
+use crate::tasks::{Download, Tasks};
 
 pub static COOL_LIST: Lazy<Arc<RwLock<HashMap<String, Cool>>>> = Lazy::new(|| {
     let mut map = HashMap::new();
@@ -22,9 +22,15 @@ pub static COOL_LIST: Lazy<Arc<RwLock<HashMap<String, Cool>>>> = Lazy::new(|| {
         name: "homebrew".to_string(),
         description: "适用于macOS的包管理器。它使您能够从命令行安装和更新软件包，从而使您的Mac保持最新状态，而无需使用App Store。".to_string(),
         dependencies: vec![],
-        install_tasks: Tasks(vec![]),
-        uninstall_tasks: Tasks(vec![]),
-        check_tasks: Tasks(vec![]),
+        macos: Some(PlatformTasks {
+            install_tasks: Tasks(vec![
+                // Download::new("https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh", format!("{}/install.sh", std::env::temp_dir().to_str().unwrap())),
+            ]),
+            uninstall_tasks: Tasks(vec![]),
+            check_tasks: Tasks(vec![]),
+        }),
+        linux: None,
+        windows: None,
     };
     map.insert(brew_cool.name.clone(), brew_cool);
 
@@ -32,8 +38,10 @@ pub static COOL_LIST: Lazy<Arc<RwLock<HashMap<String, Cool>>>> = Lazy::new(|| {
 });
 
 lazy_static! {
-    static ref INSTALLING: Arc<RwLock<HashMap<String, Receiver<()>>>> = Arc::new(RwLock::new(HashMap::new()));
-    static ref UNINSTALLING: Arc<RwLock<HashMap<String, Receiver<()>>>> = Arc::new(RwLock::new(HashMap::new()));
+    static ref INSTALLING: Arc<RwLock<HashMap<String, Receiver<()>>>> =
+        Arc::new(RwLock::new(HashMap::new()));
+    static ref UNINSTALLING: Arc<RwLock<HashMap<String, Receiver<()>>>> =
+        Arc::new(RwLock::new(HashMap::new()));
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -41,9 +49,9 @@ pub struct Cool {
     pub name: String,
     pub description: String,
     pub dependencies: Vec<String>,
-    pub install_tasks: Tasks,
-    pub uninstall_tasks: Tasks,
-    pub check_tasks: Tasks,
+    pub macos: Option<PlatformTasks>,
+    pub linux: Option<PlatformTasks>,
+    pub windows: Option<PlatformTasks>,
 }
 
 impl Cool {
@@ -51,18 +59,35 @@ impl Cool {
         name: String,
         description: String,
         dependencies: Vec<String>,
-        install_tasks: Tasks,
-        uninstall_tasks: Tasks,
-        check_tasks: Tasks,
+        macos: Option<PlatformTasks>,
+        linux: Option<PlatformTasks>,
+        windows: Option<PlatformTasks>,
     ) -> Self {
         Self {
             name,
             description,
             dependencies,
-            install_tasks,
-            uninstall_tasks,
-            check_tasks,
+            macos,
+            linux,
+            windows,
         }
+    }
+
+    fn current_platform_tasks(&self) -> CoolResult<&PlatformTasks> {
+        let mut platform_tasks = if cfg!(macos) {
+            &self.macos
+        } else if cfg!(linux) {
+            &self.linux
+        } else if cfg!(windows) {
+            &self.windows
+        } else {
+            return Err(eyre!("unsupported platform"));
+        };
+
+        platform_tasks
+            .as_ref()
+            .take()
+            .ok_or_else(|| eyre!("{} is not supported on this platform", self.name))
     }
 
     pub fn install(&mut self) -> CoolResult<Vec<Vec<String>>> {
@@ -80,12 +105,16 @@ impl Cool {
 
         self.install_dependencies()?;
 
-        let mut tasks = self.install_tasks.clone();
+        let platform_tasks = self.current_platform_tasks()?;
+        let mut tasks = platform_tasks.install_tasks.clone();
         let handle = thread::spawn(move || tasks.execute());
 
         let (sender, receiver) = crossbeam::channel::bounded(1);
 
-        INSTALLING.write().unwrap().insert(name.clone(), receiver.clone());
+        INSTALLING
+            .write()
+            .unwrap()
+            .insert(name.clone(), receiver.clone());
 
         let result = handle.join().unwrap()?;
         sender.send(())?;
@@ -107,12 +136,16 @@ impl Cool {
             INSTALLING.read().unwrap()[&name].recv()?;
         }
 
-        let mut tasks = self.uninstall_tasks.clone();
+        let platform_tasks = self.current_platform_tasks()?;
+        let mut tasks = platform_tasks.uninstall_tasks.clone();
         let handle = thread::spawn(move || tasks.execute());
 
         let (sender, receiver) = crossbeam::channel::bounded(1);
 
-        UNINSTALLING.write().unwrap().insert(name.clone(), receiver.clone());
+        UNINSTALLING
+            .write()
+            .unwrap()
+            .insert(name.clone(), receiver.clone());
 
         let result = handle.join().unwrap()?;
         sender.send(())?;
@@ -145,4 +178,11 @@ impl Cool {
             })?;
         Ok(results)
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct PlatformTasks {
+    pub install_tasks: Tasks,
+    pub uninstall_tasks: Tasks,
+    pub check_tasks: Tasks,
 }

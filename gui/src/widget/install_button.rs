@@ -1,14 +1,19 @@
-use crossbeam::channel::Sender;
+use cool::Cool;
 use egui::hex_color;
 
-pub struct InstallButton {
+pub struct InstallButton<'a> {
+    pub cool: &'a mut Cool,
     pub width: Option<f32>,
     pub height: Option<f32>,
 }
 
-impl InstallButton {
-    pub fn new(install_sender: Sender<()>, width: Option<f32>, height: Option<f32>) -> Self {
-        Self { width, height }
+impl<'a> InstallButton<'a> {
+    pub fn new(cool: &'a mut Cool, width: Option<f32>, height: Option<f32>) -> Self {
+        Self {
+            cool,
+            width,
+            height,
+        }
     }
 
     pub fn width(mut self, width: f32) -> Self {
@@ -22,7 +27,7 @@ impl InstallButton {
     }
 }
 
-impl InstallButton {
+impl<'a> InstallButton<'a> {
     pub fn show(&mut self, ui: &mut egui::Ui) -> egui::InnerResponse<()> {
         ui.scope(|ui| {
             ui.style_mut().visuals.widgets.inactive.rounding = egui::Rounding::same(12.0);

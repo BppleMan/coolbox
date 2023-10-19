@@ -8,7 +8,7 @@ use crate::state::StateAble;
 use crate::tasks::{Executable, ExecutableState};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct Copy {
+pub struct CopyTask {
     #[serde(deserialize_with = "crate::render_str")]
     pub src: String,
     #[serde(deserialize_with = "crate::render_str")]
@@ -22,7 +22,7 @@ pub struct Copy {
     errors: Vec<String>,
 }
 
-impl Copy {
+impl CopyTask {
     pub fn new(src: String, dest: String) -> Self {
         Self {
             src,
@@ -34,7 +34,7 @@ impl Copy {
     }
 }
 
-impl StateAble for Copy {
+impl StateAble for CopyTask {
     fn current_state(&mut self) -> &mut ExecutableState {
         &mut self.state
     }
@@ -48,7 +48,7 @@ impl StateAble for Copy {
     }
 }
 
-impl Executable for Copy {
+impl Executable for CopyTask {
     fn _run(&mut self) -> CoolResult<()> {
         let src = PathBuf::from_str(&self.src)?;
         let dest = PathBuf::from_str(&self.dest)?;
@@ -88,7 +88,7 @@ mod test {
         let source_file = NamedTempFile::with_prefix_in("source", base_dir.path())?;
 
         let dest_path = base_dir.path().join("dest");
-        super::Copy::new(
+        super::CopyTask::new(
             source_file.path().to_string_lossy().to_string(),
             dest_path.as_path().to_string_lossy().to_string(),
         )
@@ -97,7 +97,7 @@ mod test {
 
         let dest_dir = Builder::new().prefix("dest").tempdir_in(base_dir.path())?;
         let dest_path = dest_dir.path();
-        super::Copy::new(
+        super::CopyTask::new(
             source_file.path().to_string_lossy().to_string(),
             dest_path.to_string_lossy().to_string(),
         )
@@ -105,7 +105,7 @@ mod test {
         assert!(dest_path.exists());
 
         let dest_path = dest_dir.path().join("dest");
-        super::Copy::new(
+        super::CopyTask::new(
             source_file.path().to_string_lossy().to_string(),
             dest_path.as_path().to_string_lossy().to_string(),
         )
@@ -131,7 +131,7 @@ mod test {
 
         let dest_dir = base_dir.path().join("dest");
         // fs_extra::dir::create(&dest_dir, true)?;
-        super::Copy::new(
+        super::CopyTask::new(
             source_dir.to_string_lossy().to_string(),
             dest_dir.to_string_lossy().to_string(),
         )

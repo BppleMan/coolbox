@@ -51,11 +51,11 @@ pub enum Shell {
 impl AsRef<dyn ShellExecutor> for Shell {
     fn as_ref(&self) -> &(dyn ShellExecutor + 'static) {
         match self {
-            Shell::Bash(Bash) => &Bash,
-            Shell::LinuxSudo(LinuxSudo) => &LinuxSudo,
-            Shell::MacOSSudo(MacOSSudo) => &MacOSSudo,
-            Shell::Sh(Sh) => &Sh,
-            Shell::Zsh(Zsh) => &Zsh,
+            Shell::Bash(bash) => bash,
+            Shell::LinuxSudo(linux_sudo) => linux_sudo,
+            Shell::MacOSSudo(macos_sudo) => macos_sudo,
+            Shell::Sh(sh) => sh,
+            Shell::Zsh(zsh) => zsh,
         }
     }
 }

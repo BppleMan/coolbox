@@ -2,26 +2,29 @@ use serde::{Deserialize, Serialize};
 
 pub use command::*;
 pub use compress::*;
-pub use copy::*;
+use cool_macros::TaskRef;
+pub use copy_task::*;
 pub use decompress::*;
 pub use delete::*;
 pub use download::*;
 pub use git::*;
 pub use install::*;
-pub use r#move::*;
+pub use move_task::*;
+pub use which::*;
 
 use crate::result::CoolResult;
 use crate::state::StateAble;
 
 mod command;
 mod compress;
-mod copy;
+mod copy_task;
 mod decompress;
 mod delete;
 mod download;
 mod git;
 mod install;
-mod r#move;
+mod move_task;
+mod which;
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
 pub enum ExecutableState {
@@ -50,46 +53,18 @@ pub trait Executable: StateAble {
     fn _run(&mut self) -> CoolResult<()>;
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, TaskRef)]
 pub enum Task {
     Command(Command),
     Compress(Compress),
-    Copy(Copy),
+    CopyTask(CopyTask),
     Decompress(Decompress),
     Delete(Delete),
+    Download(Download),
     Install(Install),
-    Move(Move),
+    MoveTask(MoveTask),
     Git(Git),
-}
-
-impl AsRef<dyn Executable> for Task {
-    fn as_ref(&self) -> &(dyn Executable + 'static) {
-        match self {
-            Task::Copy(copy) => copy,
-            Task::Command(command) => command,
-            Task::Compress(compress) => compress,
-            Task::Decompress(decompress) => decompress,
-            Task::Delete(delete) => delete,
-            Task::Install(install) => install,
-            Task::Move(r#move) => r#move,
-            Task::Git(git) => git,
-        }
-    }
-}
-
-impl AsMut<dyn Executable> for Task {
-    fn as_mut(&mut self) -> &mut (dyn Executable + 'static) {
-        match self {
-            Task::Copy(copy) => copy,
-            Task::Command(command) => command,
-            Task::Compress(compress) => compress,
-            Task::Decompress(decompress) => decompress,
-            Task::Delete(delete) => delete,
-            Task::Install(install) => install,
-            Task::Move(r#move) => r#move,
-            Task::Git(git) => git,
-        }
-    }
+    Which(Which),
 }
 
 impl StateAble for Task {

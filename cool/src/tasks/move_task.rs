@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::str::FromStr;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct Move {
+pub struct MoveTask {
     #[serde(deserialize_with = "crate::render_str")]
     pub src: String,
     #[serde(deserialize_with = "crate::render_str")]
@@ -21,7 +21,7 @@ pub struct Move {
     errors: Vec<String>,
 }
 
-impl Move {
+impl MoveTask {
     pub fn new(src: String, dest: String) -> Self {
         Self {
             src,
@@ -33,7 +33,7 @@ impl Move {
     }
 }
 
-impl StateAble for Move {
+impl StateAble for MoveTask {
     fn current_state(&mut self) -> &mut ExecutableState {
         &mut self.state
     }
@@ -47,7 +47,7 @@ impl StateAble for Move {
     }
 }
 
-impl Executable for Move {
+impl Executable for MoveTask {
     fn _run(&mut self) -> CoolResult<()> {
         let src = PathBuf::from_str(&self.src)?;
         let dest = PathBuf::from_str(&self.dest)?;
@@ -85,7 +85,7 @@ mod test {
         let source_file = NamedTempFile::with_prefix_in("source", base_dir.path())?;
 
         let dest_path = base_dir.path().join("dest");
-        super::Move::new(
+        super::MoveTask::new(
             source_file.path().to_string_lossy().to_string(),
             dest_path.as_path().to_string_lossy().to_string(),
         )
@@ -109,7 +109,7 @@ mod test {
         let _child_file2 = File::create(child_dir.join("child_file2"))?;
 
         let dest_path = base_dir.path().join("dest");
-        super::Move::new(
+        super::MoveTask::new(
             source_dir.to_string_lossy().to_string(),
             dest_path.as_path().to_string_lossy().to_string(),
         )
