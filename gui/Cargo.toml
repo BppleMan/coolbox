@@ -12,7 +12,7 @@ crate-type = ["rlib", "dylib"]
 
 [dependencies]
 # local
-coolbox-core = { path = "../core" }
+cool = { path = "../cool" }
 
 # gui
 egui.workspace = true
@@ -20,5 +20,5 @@ eframe.workspace = true
 color-hex.workspace = true
 
 # misc
-crossbeam.worksapce = true
+crossbeam.workspace = true
 rayon.workspace = true
