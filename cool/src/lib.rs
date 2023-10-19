@@ -1,3 +1,12 @@
+pub use color_eyre::*;
+use lazy_static::lazy_static;
+use serde::{Deserialize, Deserializer};
+pub use tracing::*;
+
+pub use cool::*;
+pub use extension::*;
+pub use trace::*;
+
 mod cool;
 mod error;
 mod extension;
@@ -7,12 +16,6 @@ pub mod shell;
 pub mod state;
 pub mod tasks;
 mod trace;
-
-pub use cool::*;
-pub use extension::*;
-use lazy_static::lazy_static;
-use serde::{Deserialize, Deserializer};
-pub use trace::*;
 
 lazy_static! {
     pub static ref DEFAULT_TERA_CONTEXT: tera::Context = tera::Context::default();

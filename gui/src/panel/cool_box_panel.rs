@@ -1,5 +1,4 @@
 use crate::panel::{default_frame, Panel};
-use crate::widget::show_install_button;
 use eframe::Frame;
 use egui::Context;
 
@@ -19,9 +18,6 @@ impl CoolBoxPanel {
             ui.separator();
             ui.label(env!("CARGO_PKG_VERSION"));
             ui.add_space(ui.available_width() - button_width);
-
-            let (button, install_receiver, progress_sender) =
-                show_install_button(ui, Some(button_width), Some(button_height));
         });
     }
 }

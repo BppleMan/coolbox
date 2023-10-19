@@ -1,6 +1,7 @@
 use crate::app::CoolBoxApp;
-use coolbox_core::color_eyre::eyre::eyre;
-use coolbox_core::{init_backtrace, CBResult};
+use cool::eyre::eyre;
+use cool::init_backtrace;
+use cool::result::CoolResult;
 
 mod app;
 
@@ -18,7 +19,7 @@ mod hot_lib {
     pub fn subscribe() -> hot_lib_reloader::LibReloadObserver {}
 }
 
-fn main() -> CBResult<()> {
+fn main() -> CoolResult<()> {
     init_backtrace();
 
     let options = eframe::NativeOptions {
