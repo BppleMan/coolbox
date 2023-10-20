@@ -1,12 +1,15 @@
-use crate::result::CoolResult;
-use crate::tasks::{Executable, ExecutableState};
 use color_eyre::eyre::eyre;
-use cool_macros::State;
 use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter};
 use which::which;
 
+use cool_macros::State;
+
+use crate::result::CoolResult;
+use crate::tasks::{Executable, ExecutableState};
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, State)]
-pub struct Which {
+pub struct WhichTask {
     pub command: String,
 
     #[serde(skip)]
@@ -17,7 +20,7 @@ pub struct Which {
     errors: Vec<String>,
 }
 
-impl Which {
+impl WhichTask {
     pub fn new(command: String) -> Self {
         Self {
             command,
@@ -28,7 +31,19 @@ impl Which {
     }
 }
 
-impl Executable for Which {
+impl Display for WhichTask {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        if cfg!(unix) {
+            write!(f, "which {}", self.command)
+        } else if cfg!(windows) {
+            write!(f, "where {}", self.command)
+        } else {
+            write!(f, "which {}", self.command)
+        }
+    }
+}
+
+impl Executable for WhichTask {
     fn _run(&mut self) -> CoolResult<()> {
         match which(&self.command) {
             Ok(result) => {
@@ -41,5 +56,19 @@ impl Executable for Which {
                 Err(eyre!(msg))
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_which() -> CoolResult<()> {
+        let mut which = WhichTask::new("ls".to_string());
+        which.execute()?;
+        assert_eq!(which.outputs.len(), 1);
+        pretty_assertions::assert_eq!(which.outputs[0], "/bin/ls");
+        Ok(())
     }
 }

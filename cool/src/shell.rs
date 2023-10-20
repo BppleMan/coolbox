@@ -9,6 +9,7 @@ use color_eyre::eyre::eyre;
 use crossbeam::channel::{Receiver, Sender};
 use log::info;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use tracing::debug;
 
 // #[cfg(not(target_os = "windows"))]
 pub use bash::*;
@@ -129,7 +130,6 @@ pub trait ShellExecutor {
         if PathBuf::from_str(cmd)?.exists() {
             command.arg(cmd);
             if let Some(args) = args {
-                command.arg("--");
                 command.args(args);
             }
         } else {
@@ -150,7 +150,7 @@ pub trait ShellExecutor {
         envs: Option<&[(&str, &str)]>,
     ) -> CoolResult<Command> {
         let mut command = self.command(cmd, args)?;
-        info!("run: {}", format!("{:?}", command).truncate_string(100));
+        debug!("{}", format!("{:?}", command).truncate_string(100));
         if let Some(envs) = envs {
             command.envs(envs.to_vec());
         }

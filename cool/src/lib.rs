@@ -4,10 +4,12 @@ use serde::{Deserialize, Deserializer};
 pub use tracing::*;
 
 pub use cool::*;
+pub use cool_list::*;
 pub use extension::*;
 pub use trace::*;
 
 mod cool;
+mod cool_list;
 mod error;
 mod extension;
 pub mod installer;
@@ -18,9 +20,13 @@ pub mod tasks;
 mod trace;
 
 lazy_static! {
+    pub static ref DEFAULT_TEMP_DIR: std::path::PathBuf = std::env::temp_dir();
     pub static ref DEFAULT_TERA_CONTEXT: tera::Context = {
         let mut ctx = tera::Context::default();
-        ctx.insert("TEMP_DIR", std::env::temp_dir().to_str().unwrap());
+        ctx.insert(
+            "TEMP_DIR",
+            &format!("{}/coolbox", &DEFAULT_TEMP_DIR.to_string_lossy()),
+        );
         ctx
     };
 }

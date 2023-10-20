@@ -38,6 +38,7 @@ tera.workspace = true
 git2.workspace = true
 proxyconfig.workspace = true
 which.workspace = true
+include_dir.workspace = true
 
 [dev-dependencies]
 uuid = "1.4.1"

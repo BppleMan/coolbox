@@ -1,10 +1,13 @@
-use crate::result::CoolResult;
-use crate::state::StateAble;
-use crate::tasks::{Executable, ExecutableState};
 use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter};
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct Download {
+use cool_macros::State;
+
+use crate::result::CoolResult;
+use crate::tasks::{Executable, ExecutableState};
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, State)]
+pub struct DownloadTask {
     pub url: String,
     pub dest: String,
 
@@ -16,7 +19,7 @@ pub struct Download {
     errors: Vec<String>,
 }
 
-impl Download {
+impl DownloadTask {
     pub fn new(url: String, dest: String) -> Self {
         Self {
             url,
@@ -28,21 +31,13 @@ impl Download {
     }
 }
 
-impl StateAble for Download {
-    fn current_state(&mut self) -> &mut ExecutableState {
-        &mut self.state
-    }
-
-    fn outputs(&mut self) -> &mut Vec<String> {
-        &mut self.outputs
-    }
-
-    fn errors(&mut self) -> &mut Vec<String> {
-        &mut self.errors
+impl Display for DownloadTask {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "curl -L {} -o {}", self.url, self.dest)
     }
 }
 
-impl Executable for Download {
+impl Executable for DownloadTask {
     fn _run(&mut self) -> CoolResult<()> {
         let mut bytes = reqwest::blocking::get(&self.url)?.bytes()?;
         std::fs::write(&self.dest, &mut bytes)?;
@@ -52,10 +47,11 @@ impl Executable for Download {
 
 #[cfg(test)]
 mod test {
+    use tempfile::{Builder, NamedTempFile};
+
     use crate::init_backtrace;
     use crate::result::CoolResult;
-    use crate::tasks::{Download, Executable, ExecutableState};
-    use tempfile::{Builder, NamedTempFile};
+    use crate::tasks::{DownloadTask, Executable, ExecutableState};
 
     #[test]
     fn smoke() -> CoolResult<()> {
@@ -73,7 +69,7 @@ mod test {
 
         let base_dir = Builder::new().prefix("cool").suffix("download").tempdir()?;
         let path = NamedTempFile::new_in(base_dir.path())?;
-        let mut download = Download::new(
+        let mut download = DownloadTask::new(
             format!("{}/download", url),
             path.path().display().to_string(),
         );

@@ -1,0 +1,13 @@
+name = "ffigen"
+description = "flutter中使用ffi的依赖"
+dependencies = ["flutter"]
+
+[[install_tasks]]
+[install_tasks.CommandTask]
+script = "flutter pub add --dev ffigen"
+
+[[uninstall_tasks]]
+[uninstall_tasks.CommandTask]
+script = "flutter pub remove ffigen"
+
+[[check_tasks]]

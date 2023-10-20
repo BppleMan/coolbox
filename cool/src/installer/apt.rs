@@ -6,8 +6,6 @@ use crate::installer::Installable;
 use crate::result::CoolResult;
 use crate::shell::{Sh, ShellExecutor, ShellResult};
 
-
-
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Apt;
 
@@ -18,20 +16,6 @@ impl ShellExecutor for Apt {
         command
     }
 }
-
-// impl StateAble for Apt {
-//     fn current_state(&self) -> &ExecutableState {
-//         &self.state
-//     }
-//
-//     fn outputs(&self) -> &Vec<String> {
-//         &self.outputs
-//     }
-//
-//     fn errors(&self) -> &Vec<String> {
-//         &self.errors
-//     }
-// }
 
 impl Installable for Apt {
     fn install(&mut self, name: &str, args: Option<&[&str]>) -> CoolResult<ShellResult> {
@@ -47,7 +31,7 @@ impl Installable for Apt {
     }
 
     fn uninstall(&mut self, name: &str, args: Option<&[&str]>) -> CoolResult<ShellResult> {
-        info!("installing {} with apt-get", name);
+        info!("uninstalling {} with apt-get", name);
 
         let mut arguments = vec!["-y", "--purge"];
         if let Some(args) = args {
@@ -60,7 +44,7 @@ impl Installable for Apt {
     }
 
     fn check_available(&mut self, name: &str, _args: Option<&[&str]>) -> CoolResult<bool> {
-        info!("checking {} with apt-get", name);
+        info!("checking {}", name);
 
         Ok(Sh.run("dpkg", Some(&["-L", name]), None).is_ok())
     }

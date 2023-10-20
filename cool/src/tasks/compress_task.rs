@@ -1,20 +1,24 @@
+use std::fmt;
+use std::fmt::{Display, Formatter};
 use std::fs::File;
 use std::io::{Read, Write};
 use std::path::PathBuf;
 
 use color_eyre::eyre::eyre;
 use flate2::write::GzEncoder;
+use serde::ser::Error;
 use serde::{Deserialize, Serialize};
 use walkdir::WalkDir;
 use zip::write::FileOptions;
 use zip::{CompressionMethod, ZipWriter};
 
+use cool_macros::State;
+
 use crate::result::CoolResult;
-use crate::state::StateAble;
 use crate::tasks::{Executable, ExecutableState};
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct Compress {
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, State)]
+pub struct CompressTask {
     #[serde(deserialize_with = "crate::render_str")]
     pub src: String,
     #[serde(deserialize_with = "crate::render_str")]
@@ -28,7 +32,7 @@ pub struct Compress {
     errors: Vec<String>,
 }
 
-impl Compress {
+impl CompressTask {
     pub fn new(src: String, dest: String) -> Self {
         Self {
             src,
@@ -88,21 +92,19 @@ impl Compress {
     }
 }
 
-impl StateAble for Compress {
-    fn current_state(&mut self) -> &mut ExecutableState {
-        &mut self.state
-    }
-
-    fn outputs(&mut self) -> &mut Vec<String> {
-        &mut self.outputs
-    }
-
-    fn errors(&mut self) -> &mut Vec<String> {
-        &mut self.errors
+impl Display for CompressTask {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        if self.dest.ends_with(".zip") {
+            write!(f, "zip -r {} {}", self.dest, self.src)
+        } else if self.dest.ends_with(".tar.gz") {
+            write!(f, "tar -czf {} {}", self.dest, self.src)
+        } else {
+            Err(fmt::Error::custom(eyre!("Not support")))
+        }
     }
 }
 
-impl Executable for Compress {
+impl Executable for CompressTask {
     fn _run(&mut self) -> CoolResult<()> {
         if self.dest.ends_with(".zip") {
             self.compress_zip()
@@ -123,8 +125,8 @@ mod test {
 
     use crate::init_backtrace;
     use crate::result::CoolResult;
-    use crate::tasks::compress::Compress;
-    use crate::tasks::decompress::Decompress;
+    use crate::tasks::compress_task::CompressTask;
+    use crate::tasks::decompress_task::DecompressTask;
     use crate::tasks::Executable;
 
     fn create_dir(base_dir: &TempDir) -> CoolResult<PathBuf> {
@@ -164,7 +166,7 @@ mod test {
         let source_dir = create_dir(&base_dir)?;
 
         let zip_dest = base_dir.path().join("dest.zip");
-        let mut compress = Compress::new(
+        let mut compress = CompressTask::new(
             source_dir.to_string_lossy().to_string(),
             zip_dest.to_string_lossy().to_string(),
         );
@@ -172,7 +174,7 @@ mod test {
         assert!(zip_dest.exists());
 
         let dest = base_dir.path().join("dest");
-        let mut decompress = Decompress::new(
+        let mut decompress = DecompressTask::new(
             zip_dest.to_string_lossy().to_string(),
             dest.to_string_lossy().to_string(),
         );
@@ -193,7 +195,7 @@ mod test {
         let source_dir = create_dir(&base_dir)?;
 
         let tgz_dest = base_dir.path().join("dest.tar.gz");
-        let mut compress = Compress::new(
+        let mut compress = CompressTask::new(
             source_dir.to_string_lossy().to_string(),
             tgz_dest.to_string_lossy().to_string(),
         );
@@ -201,7 +203,7 @@ mod test {
         assert!(tgz_dest.exists());
 
         let dest = base_dir.path().join("dest");
-        let mut decompress = Decompress::new(
+        let mut decompress = DecompressTask::new(
             tgz_dest.to_string_lossy().to_string(),
             dest.to_string_lossy().to_string(),
         );

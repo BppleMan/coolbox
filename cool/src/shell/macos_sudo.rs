@@ -54,7 +54,11 @@ mod test {
         let script = reqwest::blocking::get("https://sh.rustup.rs")?.text()?;
         let mut script_file = NamedTempFile::new()?;
         script_file.write_all(script.as_bytes())?;
-        MacOSSudo.run(&format!("{}", script_file.path().display()), Some(&["-h"]), None)?;
+        MacOSSudo.run(
+            &format!("{}", script_file.path().display()),
+            Some(&["-h"]),
+            None,
+        )?;
         Ok(())
     }
 }

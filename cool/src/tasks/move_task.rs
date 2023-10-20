@@ -1,12 +1,16 @@
-use crate::result::CoolResult;
-use crate::state::StateAble;
-use crate::tasks::{Executable, ExecutableState};
-use fs_extra::dir::CopyOptions;
-use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter};
 use std::path::PathBuf;
 use std::str::FromStr;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+use fs_extra::dir::CopyOptions;
+use serde::{Deserialize, Serialize};
+
+use cool_macros::State;
+
+use crate::result::CoolResult;
+use crate::tasks::{Executable, ExecutableState};
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, State)]
 pub struct MoveTask {
     #[serde(deserialize_with = "crate::render_str")]
     pub src: String,
@@ -33,17 +37,15 @@ impl MoveTask {
     }
 }
 
-impl StateAble for MoveTask {
-    fn current_state(&mut self) -> &mut ExecutableState {
-        &mut self.state
-    }
-
-    fn outputs(&mut self) -> &mut Vec<String> {
-        &mut self.outputs
-    }
-
-    fn errors(&mut self) -> &mut Vec<String> {
-        &mut self.errors
+impl Display for MoveTask {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        if cfg!(unix) {
+            write!(f, "mv -f {} {}", self.src, self.dest)
+        } else if cfg!(windows) {
+            write!(f, "move /Y {} {}", self.src, self.dest)
+        } else {
+            write!(f, "mv -f {} {}", self.src, self.dest)
+        }
     }
 }
 
@@ -72,11 +74,13 @@ impl Executable for MoveTask {
 
 #[cfg(test)]
 mod test {
+    use std::fs::File;
+
+    use tempfile::{Builder, NamedTempFile};
+
     use crate::init_backtrace;
     use crate::result::CoolResult;
     use crate::tasks::Executable;
-    use std::fs::File;
-    use tempfile::{Builder, NamedTempFile};
 
     #[test]
     fn move_file() -> CoolResult<()> {

@@ -1,19 +1,24 @@
-use crate::result::CoolResult;
-use crate::state::StateAble;
-use crate::tasks::{Executable, ExecutableState};
-use color_eyre::eyre::eyre;
-use color_eyre::Report;
-use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
+use std::fmt::{Display, Formatter};
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
 use std::str::FromStr;
-use std::{fs, io};
+use std::{fmt, fs, io};
+
+use color_eyre::eyre::eyre;
+use color_eyre::Report;
+use serde::ser::Error;
+use serde::{Deserialize, Serialize};
 use zip::ZipArchive;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct Decompress {
+use cool_macros::State;
+
+use crate::result::CoolResult;
+use crate::tasks::{Executable, ExecutableState};
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, State)]
+pub struct DecompressTask {
     #[serde(deserialize_with = "crate::render_str")]
     pub src: String,
     #[serde(deserialize_with = "crate::render_str")]
@@ -27,7 +32,7 @@ pub struct Decompress {
     errors: Vec<String>,
 }
 
-impl Decompress {
+impl DecompressTask {
     pub fn new(src: String, dest: String) -> Self {
         Self {
             src,
@@ -155,21 +160,19 @@ impl Decompress {
     }
 }
 
-impl StateAble for Decompress {
-    fn current_state(&mut self) -> &mut ExecutableState {
-        &mut self.state
-    }
-
-    fn outputs(&mut self) -> &mut Vec<String> {
-        &mut self.outputs
-    }
-
-    fn errors(&mut self) -> &mut Vec<String> {
-        &mut self.errors
+impl Display for DecompressTask {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        if self.src.ends_with(".zip") {
+            write!(f, "unzip {} -d {}", self.src, self.dest)
+        } else if self.src.ends_with(".tar.gz") {
+            write!(f, "tar -xzf {} -C {}", self.src, self.dest)
+        } else {
+            Err(fmt::Error::custom(eyre!("Not support")))
+        }
     }
 }
 
-impl Executable for Decompress {
+impl Executable for DecompressTask {
     fn _run(&mut self) -> CoolResult<()> {
         if self.src.ends_with(".zip") {
             self.decompress_zip()

@@ -1,11 +1,13 @@
 use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter};
+
+use cool_macros::State;
 
 use crate::result::CoolResult;
-use crate::state::StateAble;
 use crate::tasks::{Executable, ExecutableState};
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct Delete {
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, State)]
+pub struct DeleteTask {
     #[serde(deserialize_with = "crate::render_str")]
     pub path: String,
 
@@ -17,7 +19,7 @@ pub struct Delete {
     errors: Vec<String>,
 }
 
-impl Delete {
+impl DeleteTask {
     pub fn new(path: String) -> Self {
         Self {
             path,
@@ -28,21 +30,13 @@ impl Delete {
     }
 }
 
-impl StateAble for Delete {
-    fn current_state(&mut self) -> &mut ExecutableState {
-        &mut self.state
-    }
-
-    fn outputs(&mut self) -> &mut Vec<String> {
-        &mut self.outputs
-    }
-
-    fn errors(&mut self) -> &mut Vec<String> {
-        &mut self.errors
+impl Display for DeleteTask {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "rm -rf {}", self.path)
     }
 }
 
-impl Executable for Delete {
+impl Executable for DeleteTask {
     fn _run(&mut self) -> CoolResult<()> {
         fs_extra::remove_items(&[&self.path])?;
         Ok(())
@@ -52,11 +46,12 @@ impl Executable for Delete {
 #[cfg(test)]
 mod test {
     use std::fs::File;
+
     use tempfile::{Builder, NamedTempFile};
 
     use crate::init_backtrace;
     use crate::result::CoolResult;
-    use crate::tasks::delete::Delete;
+    use crate::tasks::delete_task::DeleteTask;
     use crate::tasks::Executable;
 
     #[test]
@@ -65,7 +60,7 @@ mod test {
         let base_dir = Builder::new().prefix("cool").suffix("delete").tempdir()?;
         let path = NamedTempFile::new_in(base_dir.path())?;
         assert!(path.path().exists());
-        Delete::new(path.path().to_string_lossy().to_string()).execute()?;
+        DeleteTask::new(path.path().to_string_lossy().to_string()).execute()?;
         assert!(!path.path().exists());
         Ok(())
     }
@@ -83,7 +78,7 @@ mod test {
         let _child_file1 = File::create(child_dir.join("child_file1"))?;
         let _child_file2 = File::create(child_dir.join("child_file2"))?;
 
-        Delete::new(source_dir.to_string_lossy().to_string()).execute()?;
+        DeleteTask::new(source_dir.to_string_lossy().to_string()).execute()?;
 
         assert!(!source_dir.exists());
 

@@ -3,20 +3,22 @@ use std::hash::Hash;
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-// #[cfg(target_os = "linux")]
 pub use apt::*;
 pub use brew::*;
 pub use cargo::*;
+pub use dnf::*;
+pub use rpm::*;
+pub use yum::*;
 
-// #[cfg(target_os = "macos")]
 use crate::result::CoolResult;
 use crate::shell::ShellResult;
 
-// #[cfg(target_os = "linux")]
 mod apt;
-// #[cfg(target_os = "macos")]
 mod brew;
 mod cargo;
+mod dnf;
+mod rpm;
+mod yum;
 
 pub trait Installable {
     fn install(&mut self, name: &str, args: Option<&[&str]>) -> CoolResult<ShellResult>;
@@ -66,9 +68,7 @@ impl Installable for Installer {
 
     fn check_available(&mut self, name: &str, args: Option<&[&str]>) -> CoolResult<bool> {
         match self {
-            // #[cfg(target_os = "linux")]
             Installer::Apt(apt) => apt.check_available(name, args),
-            // #[cfg(target_os = "macos")]
             Installer::Brew(brew) => brew.check_available(name, args),
             Installer::Cargo(cargo) => cargo.check_available(name, args),
         }
@@ -102,7 +102,10 @@ impl<'de> Deserialize<'de> for Installer {
             // #[cfg(target_os = "macos")]
             "brew" => Ok(Installer::Brew(Brew)),
             "cargo" => Ok(Installer::Cargo(Cargo)),
-            _ => Err(serde::de::Error::custom(format!("unknown installer {}", name))),
+            _ => Err(serde::de::Error::custom(format!(
+                "unknown installer {}",
+                name
+            ))),
         }
     }
 }

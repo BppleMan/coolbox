@@ -1,15 +1,14 @@
-use color_eyre::eyre::eyre;
-use serde::{Deserialize, Serialize};
-
 use crate::installer::{Installable, Installer};
 use crate::result::CoolResult;
 use crate::shell::ShellResult;
-use crate::state::StateAble;
-
 use crate::tasks::{Executable, ExecutableState};
+use color_eyre::eyre::eyre;
+use cool_macros::State;
+use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter};
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct Install {
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, State)]
+pub struct UninstallTask {
     pub name: String,
     pub args: Option<Vec<String>>,
     pub installer: Installer,
@@ -22,7 +21,7 @@ pub struct Install {
     errors: Vec<String>,
 }
 
-impl Install {
+impl UninstallTask {
     pub fn new(name: String, args: Option<Vec<String>>, installer: Installer) -> Self {
         Self {
             name,
@@ -35,21 +34,29 @@ impl Install {
     }
 }
 
-impl StateAble for Install {
-    fn current_state(&mut self) -> &mut ExecutableState {
-        &mut self.state
-    }
+impl Display for UninstallTask {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match &self.installer {
+            Installer::Apt(_) => write!(f, "sudo apt-get remove -y --purge"),
+            Installer::Brew(_) => write!(f, "brew uninstall "),
+            Installer::Cargo(_) => write!(f, "cargo uninstall "),
+        }?;
+        if let Some(args) = self.args.as_ref() {
+            for arg in args {
+                write!(f, "{} ", arg)?;
+            }
+        }
+        write!(f, " {}", self.name)?;
 
-    fn outputs(&mut self) -> &mut Vec<String> {
-        &mut self.outputs
-    }
-
-    fn errors(&mut self) -> &mut Vec<String> {
-        &mut self.errors
+        if let Installer::Apt(_) = &self.installer {
+            write!(f, " && sudo apt-get autoremove")
+        } else {
+            Ok(())
+        }
     }
 }
 
-impl Executable for Install {
+impl Executable for UninstallTask {
     fn _run(&mut self) -> CoolResult<()> {
         let initial_result: CoolResult<()> = Err(eyre!("No attempts made"));
 
@@ -59,7 +66,7 @@ impl Executable for Install {
                     input: _input,
                     output,
                     error,
-                } = self.installer.install(
+                } = self.installer.uninstall(
                     &self.name,
                     self.args
                         .as_ref()
@@ -82,38 +89,5 @@ impl Executable for Install {
             }
             Ok(())
         })
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use crate::init_backtrace;
-    use crate::installer::{Brew, Installable, Installer};
-    use crate::result::CoolResult;
-    use crate::tasks::{Executable, Install};
-
-    #[test]
-    fn install_bat() -> CoolResult<()> {
-        init_backtrace();
-
-        #[cfg(target_os = "macos")]
-        let mut installer = Installer::Brew(Brew);
-        #[cfg(target_os = "linux")]
-        let installer = Installer::Apt(Apt);
-
-        if installer.check_available("bat", None)? {
-            installer.uninstall("bat", None)?;
-        }
-
-        #[cfg(target_os = "macos")]
-        let mut install = Install::new("bat".to_string(), None, Installer::Brew(Brew));
-        #[cfg(target_os = "linux")]
-        let mut install = Install::new("bat".to_string(), None, Installer::Apt(Apt));
-
-        install.execute()?;
-
-        installer.uninstall("bat", None)?;
-
-        Ok(())
     }
 }

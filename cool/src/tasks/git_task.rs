@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use std::path::Path;
 
 use color_eyre::eyre::eyre;
@@ -13,7 +14,7 @@ use crate::result::CoolResult;
 use crate::tasks::{Executable, ExecutableState};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, State)]
-pub struct Git {
+pub struct GitTask {
     pub command: GitCommand,
 
     #[serde(skip)]
@@ -24,7 +25,7 @@ pub struct Git {
     errors: Vec<String>,
 }
 
-impl Git {
+impl GitTask {
     pub fn new(command: GitCommand) -> Self {
         Self {
             command,
@@ -129,7 +130,31 @@ impl Git {
     }
 }
 
-impl Executable for Git {
+impl Display for GitTask {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match &self.command {
+            GitCommand::Clone { url, dest } => {
+                write!(f, "git clone {} {}", url, dest)
+            }
+            GitCommand::Pull { src } => {
+                write!(f, "git -C {} pull", src)
+            }
+            GitCommand::Checkout {
+                src,
+                branch,
+                create,
+            } => {
+                if *create {
+                    write!(f, "git -C {} checkout -b {}", src, branch)
+                } else {
+                    write!(f, "git -C {} checkout {}", src, branch)
+                }
+            }
+        }
+    }
+}
+
+impl Executable for GitTask {
     fn _run(&mut self) -> CoolResult<()> {
         match self.command.clone() {
             GitCommand::Clone { .. } => {}
@@ -197,7 +222,7 @@ mod test {
 
     use crate::init_backtrace;
     use crate::result::CoolResult;
-    use crate::tasks::{Executable, Git, GitCommand};
+    use crate::tasks::{Executable, GitCommand, GitTask};
 
     #[test]
     fn test_pull() -> CoolResult<()> {
@@ -225,7 +250,7 @@ git remote -v
             .wait_with_output()?;
         println!("{}", String::from_utf8(output.stdout)?);
 
-        Git::new(GitCommand::Pull {
+        GitTask::new(GitCommand::Pull {
             src: test_repo.to_string_lossy().to_string(),
         })
         .execute()?;
@@ -260,7 +285,7 @@ git commit -m 'init'
             .wait_with_output()?;
         println!("{}", String::from_utf8(output.stdout)?);
 
-        Git::new(GitCommand::Checkout {
+        GitTask::new(GitCommand::Checkout {
             src: checkout_dir.to_string_lossy().to_string(),
             branch: "dev".to_string(),
             create: true,
@@ -271,7 +296,7 @@ git commit -m 'init'
         assert!(repo.find_branch("dev", git2::BranchType::Local).is_ok());
         pretty_assertions::assert_eq!(repo.head()?.shorthand(), Some("dev"));
 
-        Git::new(GitCommand::Checkout {
+        GitTask::new(GitCommand::Checkout {
             src: checkout_dir.to_string_lossy().to_string(),
             branch: "main".to_string(),
             create: false,
