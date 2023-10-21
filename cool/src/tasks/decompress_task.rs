@@ -86,7 +86,7 @@ impl DecompressTask {
                                 fs::create_dir_all(parent)?;
                             }
                         }
-                        if cfg!(unix)
+                        if cfg!(target_os = "unix")
                             && file.unix_mode().is_some()
                             && file.unix_mode().unwrap() & 0o120000 == 0o120000
                         {

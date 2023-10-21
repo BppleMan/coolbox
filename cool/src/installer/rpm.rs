@@ -16,6 +16,10 @@ impl ShellExecutor for Rpm {
 }
 
 impl Installable for Rpm {
+    fn name(&self) -> &'static str {
+        "rpm"
+    }
+
     fn install(&mut self, name: &str, args: Option<&[&str]>) -> CoolResult<ShellResult> {
         info!("installing {} with rpm", name);
 

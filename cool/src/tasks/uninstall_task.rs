@@ -40,6 +40,9 @@ impl Display for UninstallTask {
             Installer::Apt(_) => write!(f, "sudo apt-get remove -y --purge"),
             Installer::Brew(_) => write!(f, "brew uninstall "),
             Installer::Cargo(_) => write!(f, "cargo uninstall "),
+            Installer::Yun(_) => write!(f, "sudo yum remove "),
+            Installer::Dnf(_) => write!(f, "sudo dnf remove "),
+            Installer::Rpm(_) => write!(f, "sudo rpm -e "),
         }?;
         if let Some(args) = self.args.as_ref() {
             for arg in args {

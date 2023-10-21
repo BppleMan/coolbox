@@ -18,6 +18,10 @@ impl ShellExecutor for Apt {
 }
 
 impl Installable for Apt {
+    fn name(&self) -> &'static str {
+        "apt"
+    }
+
     fn install(&mut self, name: &str, args: Option<&[&str]>) -> CoolResult<ShellResult> {
         info!("installing {} with apt-get", name);
 

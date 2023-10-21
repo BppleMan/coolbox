@@ -42,6 +42,9 @@ impl Display for InstallTask {
             Installer::Apt(_) => write!(f, "sudo apt-get install -y "),
             Installer::Brew(_) => write!(f, "brew install "),
             Installer::Cargo(_) => write!(f, "cargo install "),
+            Installer::Yun(_) => write!(f, "sudo yum install -y "),
+            Installer::Dnf(_) => write!(f, "sudo dnf install -y "),
+            Installer::Rpm(_) => write!(f, "sudo rpm -i "),
         }?;
         if let Some(args) = self.args.as_ref() {
             for arg in args {

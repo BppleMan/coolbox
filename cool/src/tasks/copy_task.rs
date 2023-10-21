@@ -38,9 +38,9 @@ impl CopyTask {
 
 impl Display for CopyTask {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        if cfg!(unix) {
+        if cfg!(target_os = "unix") {
             write!(f, "cp -rf {} {}", self.src, self.dest)
-        } else if cfg!(windows) {
+        } else if cfg!(target_os = "windows") {
             write!(f, "xcopy /E /I /Y {} {}", self.src, self.dest)
         } else {
             write!(f, "cp -rf {} {}", self.src, self.dest)

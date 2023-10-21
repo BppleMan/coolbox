@@ -25,6 +25,10 @@ impl ShellExecutor for Cargo {
 }
 
 impl Installable for Cargo {
+    fn name(&self) -> &'static str {
+        "cargo"
+    }
+
     fn install(&mut self, name: &str, args: Option<&[&str]>) -> CoolResult<ShellResult> {
         info!("installing {} with cargo", name);
 

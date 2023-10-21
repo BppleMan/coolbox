@@ -65,6 +65,7 @@ pub trait Executable: StateAble + Display {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, TaskRef)]
 pub enum Task {
+    CheckTask(CheckTask),
     CommandTask(CommandTask),
     CompressTask(CompressTask),
     CopyTaskTask(CopyTask),

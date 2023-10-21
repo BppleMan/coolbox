@@ -16,6 +16,10 @@ impl ShellExecutor for Dnf {
 }
 
 impl Installable for Dnf {
+    fn name(&self) -> &'static str {
+        "dnf"
+    }
+
     fn install(&mut self, name: &str, args: Option<&[&str]>) -> CoolResult<ShellResult> {
         info!("installing {} with dnf", name);
 

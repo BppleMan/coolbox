@@ -39,9 +39,9 @@ impl MoveTask {
 
 impl Display for MoveTask {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        if cfg!(unix) {
+        if cfg!(target_os = "unix") {
             write!(f, "mv -f {} {}", self.src, self.dest)
-        } else if cfg!(windows) {
+        } else if cfg!(target_os = "windows") {
             write!(f, "move /Y {} {}", self.src, self.dest)
         } else {
             write!(f, "mv -f {} {}", self.src, self.dest)

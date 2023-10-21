@@ -33,9 +33,9 @@ impl WhichTask {
 
 impl Display for WhichTask {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        if cfg!(unix) {
+        if cfg!(target_os = "unix") {
             write!(f, "which {}", self.command)
-        } else if cfg!(windows) {
+        } else if cfg!(target_os = "windows") {
             write!(f, "where {}", self.command)
         } else {
             write!(f, "which {}", self.command)

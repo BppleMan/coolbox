@@ -11,41 +11,26 @@ use log::info;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use tracing::debug;
 
-// #[cfg(not(target_os = "windows"))]
 pub use bash::*;
-// #[cfg(target_os = "linux")]
 pub use linux_sudo::*;
-// #[cfg(target_os = "macos")]
 pub use macos_sudo::*;
-// #[cfg(not(target_os = "windows"))]
 pub use sh::*;
 pub use zsh::*;
 
-// #[cfg(not(target_os = "windows"))]
 use crate::result::CoolResult;
 
-// #[cfg(not(target_os = "windows"))]
 mod bash;
-// #[cfg(target_os = "linux")]
 mod linux_sudo;
-// #[cfg(target_os = "macos")]
 mod macos_sudo;
-// #[cfg(not(target_os = "windows"))]
 mod sh;
-// #[cfg(not(target_os = "windows"))]
 mod zsh;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Shell {
-    // #[cfg(not(target_os = "windows"))]
     Bash(Bash),
-    // #[cfg(target_os = "linux")]
     LinuxSudo(LinuxSudo),
-    // #[cfg(target_os = "macos")]
     MacOSSudo(MacOSSudo),
-    // #[cfg(not(target_os = "windows"))]
     Sh(Sh),
-    // #[cfg(not(target_os = "windows"))]
     Zsh(Zsh),
 }
 
@@ -86,15 +71,10 @@ impl Serialize for Shell {
         S: Serializer,
     {
         match self {
-            // #[cfg(not(target_os = "windows"))]
             Shell::Bash(_) => serializer.serialize_str("bash"),
-            // #[cfg(target_os = "linux")]
             Shell::LinuxSudo(_) => serializer.serialize_str("linux_sudo"),
-            // #[cfg(target_os = "macos")]
             Shell::MacOSSudo(_) => serializer.serialize_str("macos_sudo"),
-            // #[cfg(not(target_os = "windows"))]
             Shell::Sh(_) => serializer.serialize_str("sh"),
-            // #[cfg(not(target_os = "windows"))]
             Shell::Zsh(_) => serializer.serialize_str("zsh"),
         }
     }
@@ -107,15 +87,10 @@ impl<'de> Deserialize<'de> for Shell {
     {
         let name = <String>::deserialize(deserializer)?;
         match name {
-            // #[cfg(not(target_os = "windows"))]
             name if name == "bash" => Ok(Shell::Bash(Bash)),
-            // #[cfg(target_os = "linux")]
             name if name == "linux_sudo" => Ok(Shell::LinuxSudo(LinuxSudo)),
-            // #[cfg(target_os = "macos")]
             name if name == "macos_sudo" => Ok(Shell::MacOSSudo(MacOSSudo)),
-            // #[cfg(not(target_os = "windows"))]
             name if name == "sh" => Ok(Shell::Sh(Sh)),
-            // #[cfg(not(target_os = "windows"))]
             name if name == "zsh" => Ok(Shell::Zsh(Zsh)),
             _ => Err(serde::de::Error::custom(format!("unknown shell: {}", name))),
         }

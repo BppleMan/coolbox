@@ -31,9 +31,9 @@ impl ExistsTask {
 
 impl Display for ExistsTask {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        if cfg!(unix) {
+        if cfg!(target_os = "unix") {
             write!(f, "test -e {}", self.path)
-        } else if cfg!(windows) {
+        } else if cfg!(target_os = "windows") {
             write!(f, "if exist {}", self.path)
         } else {
             write!(f, "test -e {}", self.path)

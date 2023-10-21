@@ -21,6 +21,8 @@ mod rpm;
 mod yum;
 
 pub trait Installable {
+    fn name(&self) -> &'static str;
+
     fn install(&mut self, name: &str, args: Option<&[&str]>) -> CoolResult<ShellResult>;
 
     fn uninstall(&mut self, name: &str, args: Option<&[&str]>) -> CoolResult<ShellResult>;
@@ -30,11 +32,12 @@ pub trait Installable {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Installer {
-    // #[cfg(target_os = "linux")]
-    Apt(Apt),
-    // #[cfg(target_os = "macos")]
     Brew(Brew),
     Cargo(Cargo),
+    Apt(Apt),
+    Yun(Yum),
+    Dnf(Dnf),
+    Rpm(Rpm),
 }
 
 impl AsRef<dyn Installable> for Installer {
@@ -43,6 +46,9 @@ impl AsRef<dyn Installable> for Installer {
             Installer::Apt(apt) => apt,
             Installer::Brew(brew) => brew,
             Installer::Cargo(cargo) => cargo,
+            Installer::Yun(yum) => yum,
+            Installer::Dnf(dnf) => dnf,
+            Installer::Rpm(rpm) => rpm,
         }
     }
 }
@@ -53,11 +59,18 @@ impl AsMut<dyn Installable> for Installer {
             Installer::Apt(apt) => apt,
             Installer::Brew(brew) => brew,
             Installer::Cargo(cargo) => cargo,
+            Installer::Yun(yum) => yum,
+            Installer::Dnf(dnf) => dnf,
+            Installer::Rpm(rpm) => rpm,
         }
     }
 }
 
 impl Installable for Installer {
+    fn name(&self) -> &'static str {
+        self.as_ref().name()
+    }
+
     fn install(&mut self, name: &str, args: Option<&[&str]>) -> CoolResult<ShellResult> {
         self.as_mut().install(name, args)
     }
@@ -67,11 +80,7 @@ impl Installable for Installer {
     }
 
     fn check_available(&mut self, name: &str, args: Option<&[&str]>) -> CoolResult<bool> {
-        match self {
-            Installer::Apt(apt) => apt.check_available(name, args),
-            Installer::Brew(brew) => brew.check_available(name, args),
-            Installer::Cargo(cargo) => cargo.check_available(name, args),
-        }
+        self.as_mut().check_available(name, args)
     }
 }
 
@@ -80,13 +89,7 @@ impl Serialize for Installer {
     where
         S: Serializer,
     {
-        match self {
-            // #[cfg(target_os = "linux")]
-            Installer::Apt(_) => serializer.serialize_str("apt"),
-            // #[cfg(target_os = "macos")]
-            Installer::Brew(_) => serializer.serialize_str("brew"),
-            Installer::Cargo(_) => serializer.serialize_str("cargo"),
-        }
+        serializer.serialize_str(self.as_ref().name())
     }
 }
 
@@ -97,11 +100,12 @@ impl<'de> Deserialize<'de> for Installer {
     {
         let name = String::deserialize(deserializer)?;
         match name.as_str() {
-            // #[cfg(target_os = "linux")]
-            "apt" => Ok(Installer::Apt(Apt)),
-            // #[cfg(target_os = "macos")]
-            "brew" => Ok(Installer::Brew(Brew)),
-            "cargo" => Ok(Installer::Cargo(Cargo)),
+            name if name == Apt.name() => Ok(Installer::Apt(Apt)),
+            name if name == Brew.name() => Ok(Installer::Brew(Brew)),
+            name if name == Cargo.name() => Ok(Installer::Cargo(Cargo)),
+            name if name == Yum.name() => Ok(Installer::Yun(Yum)),
+            name if name == Dnf.name() => Ok(Installer::Dnf(Dnf)),
+            name if name == Rpm.name() => Ok(Installer::Rpm(Rpm)),
             _ => Err(serde::de::Error::custom(format!(
                 "unknown installer {}",
                 name

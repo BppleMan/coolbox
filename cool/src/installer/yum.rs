@@ -16,6 +16,10 @@ impl ShellExecutor for Yum {
 }
 
 impl Installable for Yum {
+    fn name(&self) -> &'static str {
+        "yum"
+    }
+
     fn install(&mut self, name: &str, args: Option<&[&str]>) -> CoolResult<ShellResult> {
         info!("installing {} with yum", name);
 

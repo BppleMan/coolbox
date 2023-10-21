@@ -25,6 +25,10 @@ impl ShellExecutor for Brew {
 }
 
 impl Installable for Brew {
+    fn name(&self) -> &'static str {
+        "brew"
+    }
+
     fn install(&mut self, name: &str, args: Option<&[&str]>) -> CoolResult<ShellResult> {
         info!("installing {} with brew", name);
 
