@@ -9,11 +9,12 @@ repository.workspace = true
 
 [dependencies]
 # local
-cool = { path = "../cool" }
-coolbox-gui = { path = "../gui" }
+cool = { path = "../coolbox-cool" }
+coolbox-gui = { path = "../coolbox-gui" }
 
 # gui
 egui.workspace = true
+egui_extras.workspace = true
 eframe.workspace = true
 color-hex.workspace = true
 

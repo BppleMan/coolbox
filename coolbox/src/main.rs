@@ -13,7 +13,7 @@ lib_dir = concat!(env!("CARGO_MANIFEST_DIR"), "/../target/debug")
 mod hot_lib {
     use coolbox_gui::*;
 
-    hot_functions_from_file!("gui/src/lib.rs");
+    hot_functions_from_file!("coolbox-gui/src/lib.rs");
 
     #[lib_change_subscription]
     pub fn subscribe() -> hot_lib_reloader::LibReloadObserver {}
@@ -43,6 +43,7 @@ fn main() -> CoolResult<()> {
                     ctx.request_repaint();
                 });
             }
+            egui_extras::install_image_loaders(&_cc.egui_ctx);
             Box::new(CoolBoxApp::default())
         }),
     )

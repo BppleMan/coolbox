@@ -3,7 +3,7 @@ use crate::hot_lib::render;
 #[cfg(not(feature = "hot-reload"))]
 use coolbox_gui::render;
 use coolbox_gui::State;
-use eframe::Frame;
+use eframe::{Frame, Storage};
 use egui::Context;
 
 #[derive(Debug, Default)]

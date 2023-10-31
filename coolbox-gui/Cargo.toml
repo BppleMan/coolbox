@@ -1,0 +1,26 @@
+[package]
+name = "coolbox-gui"
+description = "A gui lib for cool box."
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license-file.workspace = true
+repository.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# local
+cool = { path = "../coolbox-cool" }
+
+# gui
+egui.workspace = true
+eframe.workspace = true
+egui_extras.workspace = true
+color-hex.workspace = true
+image.workspace = true
+
+# misc
+crossbeam.workspace = true
+rayon.workspace = true

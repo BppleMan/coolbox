@@ -8,6 +8,9 @@
       <sourceFolder url="file://$MODULE_DIR$/gui/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/cool-macros/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/cool/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/coolbox-cool/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/coolbox-gui/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/coolbox-macros/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
