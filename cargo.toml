@@ -44,8 +44,11 @@ proxyconfig = "0.1.1"
 which = "5.0.0"
 include_dir = { version = "0.7.3", features = ["glob"] }
 
-egui = { version = "0.23.0", features = ["serde", "persistence", "color-hex"] }
-egui_extras = { version = "0.23.0", features = ["all_loaders", "svg"] }
-eframe = "0.23.0"
+#egui = { version = "0.23.0", features = ["serde", "persistence", "color-hex"] }
+#egui_extras = { version = "0.23.0", features = ["all_loaders", "svg"] }
+#eframe = "0.23.0"
+egui = { path = "../../sofunny/egui/crates/egui", features = ["serde", "persistence", "color-hex"] }
+egui_extras = { path = "../../sofunny/egui/crates/egui_extras", features = ["all_loaders", "svg"] }
+eframe = { path = "../../sofunny/egui/crates/eframe" }
 color-hex = "0.2.0"
 image = "0.24.7"
