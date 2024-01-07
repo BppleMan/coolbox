@@ -8,3 +8,5 @@
 - Always need to determine linux/darwin in the shell script of onekey_install.sh? Or is it a different distribution of linux?
 
 ***Then use CoolBox***
+
+# Still in the development stage
